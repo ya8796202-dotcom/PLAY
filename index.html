@@ -1,0 +1,38 @@
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yasser Video Studio</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#111827" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>استوديو ياسر لصناعة الفيديو</h1>
+    <nav>
+      <button id="newProjectBtn">مشروع جديد</button>
+      <button id="saveProjectBtn">حفظ</button>
+      <button id="loadProjectBtn">تحميل</button>
+      <button id="renderBtn">تصدير</button>
+    </nav>
+  </header>
+  <main class="app-main">
+    <aside class="sidebar">
+      <h2>وسائط</h2>
+      <input id="filePicker" type="file" multiple />
+      <ul id="mediaList"></ul>
+    </aside>
+    <section class="editor">
+      <video id="previewVideo" controls muted></video>
+      <div id="timelineRoot"></div>
+    </section>
+  </main>
+  <footer class="app-footer">
+    <small>© 2025 Yasser Ahmed Hamdy</small>
+  </footer>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
