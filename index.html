@@ -3,64 +3,66 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>منصة الألعاب - ياسر</title>
+  <title>منصة ألعاب ياسر</title>
   <style>
-    :root {
-      --bg:#0f0f14; --accent:#ff6fa9; --accent2:#7dd3fc; --text:#f5f5f7;
-    }
-    body {
-      background:var(--bg); color:var(--text);
-      font-family:"Segoe UI",system-ui; margin:0;
-    }
+    :root { --bg:#0f0f14; --surface:#111119; --text:#f5f5f7; --accent:#ff6fa9; --accent2:#7dd3fc; }
+    * { box-sizing:border-box }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:"Segoe UI",system-ui,Helvetica,Arial }
     header {
       background:linear-gradient(135deg,var(--accent),var(--accent2));
-      padding:20px; text-align:center; color:#fff;
+      padding:24px; text-align:center; color:#0f0f14;
+      box-shadow:0 6px 20px rgba(0,0,0,0.25)
     }
-    h1 { margin:0; font-size:2rem; }
-    nav { margin-top:10px; }
+    h1 { margin:0; font-size:2rem; font-weight:800 }
+    nav { margin-top:12px }
     nav button {
-      background:#fff; color:#0f0f14; border:none;
-      padding:10px 16px; margin:5px; border-radius:8px;
-      cursor:pointer; font-weight:bold;
+      background:#0f0f14; color:#fff; border:none; padding:10px 14px; margin:4px; border-radius:10px;
+      cursor:pointer; font-weight:600; transition:transform .08s ease, opacity .2s
     }
-    .container { max-width:1000px; margin:auto; padding:20px; }
-    .game { display:none; margin-top:20px; }
-    canvas { background:#111119; border:1px solid #2b2b35; border-radius:8px; }
-    .card-grid { display:grid; grid-template-columns:repeat(4,80px); gap:10px; justify-content:center; }
+    nav button:hover { transform:translateY(-1px); opacity:.9 }
+    .container { max-width:1000px; margin:auto; padding:24px }
+    .status { background:var(--surface); border:1px solid #2b2b35; border-radius:12px; padding:10px; font-size:.95rem }
+    .game { display:none; margin-top:20px }
+    canvas { background:var(--surface); border:1px solid #2b2b35; border-radius:12px }
+    .card-grid { display:grid; grid-template-columns:repeat(4,80px); gap:10px; justify-content:center }
     .card {
-      width:80px; height:80px; background:#1b1b25; border-radius:8px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:24px; cursor:pointer; color:var(--accent);
+      width:80px; height:80px; background:#1b1b25; border:1px solid #2b2b35; border-radius:10px;
+      display:flex; align-items:center; justify-content:center; font-size:24px; cursor:pointer; color:var(--accent); user-select:none
     }
+    footer { text-align:center; color:#9aa0a6; font-size:.9rem; padding:24px }
   </style>
 </head>
 <body>
   <header>
     <h1>🎮 منصة ألعاب ياسر</h1>
     <nav>
-      <button onclick="showGame('tic')">Tic-Tac-Toe</button>
+      <button onclick="showGame('tic')">Tic‑Tac‑Toe</button>
       <button onclick="showGame('snake')">Snake</button>
-      <button onclick="showGame('2048')">2048</button>
+      <button onclick="showGame('g2048')">2048</button>
       <button onclick="showGame('memory')">Memory Cards</button>
     </nav>
   </header>
 
   <div class="container">
+    <div class="status" id="status">جاهز — اضغط زر لعبة لبدء اللعب.</div>
+
     <!-- Tic Tac Toe -->
     <div id="tic" class="game">
-      <h2>Tic-Tac-Toe</h2>
-      <canvas id="ticCanvas" width="300" height="300"></canvas>
+      <h2>Tic‑Tac‑Toe</h2>
+      <canvas id="ticCanvas" width="300" height="300" aria-label="لوحة اللعبة"></canvas>
     </div>
 
     <!-- Snake -->
     <div id="snake" class="game">
       <h2>Snake</h2>
+      <p>استخدم أسهم الاتجاه.</p>
       <canvas id="snakeCanvas" width="400" height="400"></canvas>
     </div>
 
     <!-- 2048 -->
-    <div id="2048" class="game">
+    <div id="g2048" class="game">
       <h2>2048</h2>
+      <p>استخدم أسهم الاتجاه.</p>
       <canvas id="c2048" width="320" height="320"></canvas>
     </div>
 
@@ -71,85 +73,173 @@
     </div>
   </div>
 
+  <footer>© ياسر — هوية أنيقة وألعاب ممتعة</footer>
+
 <script>
-function showGame(id){
-  document.querySelectorAll('.game').forEach(g=>g.style.display='none');
-  document.getElementById(id).style.display='block';
-}
+  // تبديل الألعاب
+  function showGame(id){
+    document.querySelectorAll('.game').forEach(g => g.style.display = 'none');
+    const el = document.getElementById(id);
+    el.style.display = 'block';
+    document.getElementById('status').textContent = 'تم فتح: ' + el.querySelector('h2').textContent;
+  }
 
-/* --- Tic Tac Toe --- */
-(function(){
-  const c=document.getElementById('ticCanvas'),ctx=c.getContext('2d');
-  let grid=Array(9).fill(null),turn='X';
-  function draw(){
-    ctx.clearRect(0,0,300,300); ctx.strokeStyle='#444';
-    for(let i=1;i<3;i++){ ctx.beginPath(); ctx.moveTo(i*100,0); ctx.lineTo(i*100,300); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0,i*100); ctx.lineTo(300,i*100); ctx.stroke(); }
-    ctx.font='64px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    grid.forEach((v,i)=>{ if(v){ const x=(i%3)*100+50,y=Math.floor(i/3)*100+50;
-      ctx.fillStyle=v==='X'?'#ff6fa9':'#7dd3fc'; ctx.fillText(v,x,y); }});
-  }
-  function winner(g){
-    const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    for(const [a,b,c] of w){ if(g[a]&&g[a]===g[b]&&g[a]===g[c]) return g[a]; }
-    return g.every(Boolean)?'تعادل':null;
-  }
-  c.addEventListener('click',e=>{
-    const rect=c.getBoundingClientRect();
-    const x=e.clientX-rect.left,y=e.clientY-rect.top;
-    const i=Math.floor(x/100)+Math.floor(y/100)*3;
-    if(grid[i]) return;
-    grid[i]=turn; turn=turn==='X'?'O':'X';
-    const w=winner(grid); draw();
-    if(w){ setTimeout(()=>{ alert('النتيجة: '+w); grid=Array(9).fill(null); turn='X'; draw(); },50); }
-  });
-  draw();
-})();
-
-/* --- Snake --- */
-(function(){
-  const c=document.getElementById('snakeCanvas'),ctx=c.getContext('2d');
-  let snake=[{x:200,y:200}],dir={x:20,y:0},food={x:100,y:100};
-  function draw(){
-    ctx.fillStyle='#111119'; ctx.fillRect(0,0,400,400);
-    ctx.fillStyle='#ff6fa9'; snake.forEach(s=>ctx.fillRect(s.x,s.y,20,20));
-    ctx.fillStyle='#7dd3fc'; ctx.fillRect(food.x,food.y,20,20);
-  }
-  function update(){
-    const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
-    snake.unshift(head);
-    if(head.x===food.x&&head.y===food.y){
-      food={x:Math.floor(Math.random()*20)*20,y:Math.floor(Math.random()*20)*20};
-    } else snake.pop();
-    if(head.x<0||head.y<0||head.x>=400||head.y>=400||snake.slice(1).some(s=>s.x===head.x&&s.y===head.y)){
-      alert('انتهت اللعبة'); snake=[{x:200,y:200}]; dir={x:20,y:0};
+  // Tic Tac Toe
+  (function(){
+    const c = document.getElementById('ticCanvas'); if(!c) return;
+    const ctx = c.getContext('2d'); let grid = Array(9).fill(null), turn = 'X';
+    function draw(){
+      ctx.clearRect(0,0,300,300); ctx.strokeStyle = '#444';
+      for(let i=1;i<3;i++){ ctx.beginPath(); ctx.moveTo(i*100,0); ctx.lineTo(i*100,300); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,i*100); ctx.lineTo(300,i*100); ctx.stroke(); }
+      ctx.font = '64px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      grid.forEach((v,i)=>{ if(v){ const x=(i%3)*100+50, y=Math.floor(i/3)*100+50;
+        ctx.fillStyle = v==='X' ? '#ff6fa9' : '#7dd3fc'; ctx.fillText(v,x,y); }});
     }
+    function winner(g){
+      const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+      for(const [a,b,c] of w){ if(g[a] && g[a]===g[b] && g[a]===g[c]) return g[a]; }
+      return g.every(Boolean) ? 'تعادل' : null;
+    }
+    c.addEventListener('click', e=>{
+      const r = c.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const i = Math.floor(x/100) + Math.floor(y/100)*3;
+      if(grid[i]) return;
+      grid[i] = turn; turn = turn==='X' ? 'O' : 'X';
+      const w = winner(grid); draw();
+      if(w){ setTimeout(()=>{ alert('النتيجة: ' + w); grid = Array(9).fill(null); turn='X'; draw(); }, 50); }
+    });
     draw();
-  }
-  setInterval(update,200);
-  window.addEventListener('keydown',e=>{
-    if(e.key==='ArrowUp') dir={x:0,y:-20};
-    if(e.key==='ArrowDown') dir={x:0,y:20};
-    if(e.key==='ArrowLeft') dir={x:-20,y:0};
-    if(e.key==='ArrowRight') dir={x:20,y:0};
-  });
-})();
+  })();
 
-/* --- 2048 --- */
-(function(){
-  const cv=document.getElementById('c2048'),cx=cv.getContext('2d');
-  let grid=Array(16).fill(0);
-  const addTile=()=>{ const e=grid.map((v,i)=>v?null:i).filter(v=>v!==null);
-    if(!e.length) return; const i=e[Math.floor(Math.random()*e.length)];
-    grid[i]=Math.random()<0.9?2:4; };
-  const draw=()=>{ cx.fillStyle='#0f0f14'; cx.fillRect(0,0,320,320);
-    for(let r=0;r<4;r++)for(let c=0;c<4;c++){ const v=grid[r*4+c];
-      cx.fillStyle=v?`hsl(${Math.min(280,Math.log2(v)*25)},70%,55%)`:'#1b1b25';
-      cx.fillRect(c*80+6,r*80+6,68,68);
-      if(v){ cx.fillStyle='#fff'; cx.font='bold 20px system-ui'; cx.textAlign='center'; cx.textBaseline='middle';
-        cx.fillText(v,c*80+40,r*80+40); } } };
-  function move(dir){
-    let moved=false;
-    const lines=[]; for(let r=0;r<4;r++){ lines.push(grid.slice(r*4,r*4+4)); }
-    const rot=m=>{ const o=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
-      for(let r=0;r<4;r++)for(let c
+  // Snake
+  (function(){
+    const c = document.getElementById('snakeCanvas'); if(!c) return;
+    const ctx = c.getContext('2d');
+    let snake = [{x:200,y:200}], dir = {x:20,y:0}, food = {x:100,y:100};
+    function draw(){
+      ctx.fillStyle = '#111119'; ctx.fillRect(0,0,400,400);
+      ctx.fillStyle = '#ff6fa9'; snake.forEach(s => ctx.fillRect(s.x,s.y,20,20));
+      ctx.fillStyle = '#7dd3fc'; ctx.fillRect(food.x,food.y,20,20);
+    }
+    function update(){
+      const head = {x:snake[0].x + dir.x, y:snake[0].y + dir.y};
+      snake.unshift(head);
+      if(head.x===food.x && head.y===food.y){
+        food = {x:Math.floor(Math.random()*20)*20, y:Math.floor(Math.random()*20)*20};
+      } else snake.pop();
+      if(head.x<0 || head.y<0 || head.x>=400 || head.y>=400 ||
+         snake.slice(1).some(s => s.x===head.x && s.y===head.y)){
+        alert('انتهت اللعبة'); snake=[{x:200,y:200}]; dir={x:20,y:0}; food={x:100,y:100};
+      }
+      draw();
+    }
+    let timer = setInterval(update, 200);
+    window.addEventListener('keydown', e=>{
+      if(e.key==='ArrowUp'   && dir.y===0) dir={x:0,y:-20};
+      if(e.key==='ArrowDown' && dir.y===0) dir={x:0,y:20};
+      if(e.key==='ArrowLeft' && dir.x===0) dir={x:-20,y:0};
+      if(e.key==='ArrowRight'&& dir.x===0) dir={x:20,y:0};
+    });
+  })();
+
+  // 2048
+  (function(){
+    const cv = document.getElementById('c2048'); if(!cv) return;
+    const cx = cv.getContext('2d'); let grid = Array(16).fill(0);
+    const addTile=()=>{ const e=grid.map((v,i)=>v?null:i).filter(v=>v!==null);
+      if(!e.length) return; const i=e[Math.floor(Math.random()*e.length)];
+      grid[i] = Math.random()<0.9 ? 2 : 4; };
+    const draw=()=>{ cx.fillStyle='#0f0f14'; cx.fillRect(0,0,320,320);
+      for(let r=0;r<4;r++)for(let c=0;c<4;c++){ const v=grid[r*4+c];
+        cx.fillStyle = v ? `hsl(${Math.min(280,Math.log2(v)*25)},70%,55%)` : '#1b1b25';
+        cx.fillRect(c*80+6, r*80+6, 68, 68);
+        if(v){ cx.fillStyle='#fff'; cx.font='bold 20px system-ui'; cx.textAlign='center'; cx.textBaseline='middle';
+          cx.fillText(v, c*80+40, r*80+40); } } };
+    function rotate(m){ const o=[[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+      for(let r=0;r<4;r++)for(let c=0;c<4;c++){ o[c][3-r]=m[r][c]; } return o; }
+    function move(dir){
+      let moved=false;
+      let m=[]; for(let r=0;r<4;r++) m.push(grid.slice(r*4,r*4+4));
+      if(dir==='up')   m = rotate(rotate(rotate(m)));
+      if(dir==='right')m = m.map(row=>row.reverse());
+      if(dir==='down') m = rotate(m);
+      m = m.map(row=>{
+        row = row.filter(v=>v);
+        for(let i=0;i<row.length-1;i++){ if(row[i]===row[i+1]){ row[i]*=2; row[i+1]=0; moved=true; } }
+        row = row.filter(v=>v); while(row.length<4) row.push(0); return row;
+      });
+      if(dir==='up')    m = rotate(rotate(rotate(m)));
+      else if(dir==='right') m = m.map(row=>row.reverse());
+      else if(dir==='down')  m = rotate(m);
+      const ng = [].concat(...m);
+      if(ng.some((v,i)=>v!==grid[i])) moved = true;
+      if(moved){ grid = ng; addTile(); draw(); }
+    }
+    function isOver(){
+      const full = grid.every(v=>v);
+      if(!full) return false;
+      // حاول كل الاتجاهات على نسخة
+      const copy = [...grid];
+      for(const d of ['up','down','left','right']){
+        grid = [...copy]; move(d);
+        if(grid.some((v,i)=>v!==copy[i])){ grid = copy; return false; }
+      }
+      grid = copy; return true;
+    }
+    addTile(); addTile(); draw();
+    window.addEventListener('keydown', e=>{
+      const map = {ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+      const d = map[e.key]; if(!d) return; move(d); if(isOver()){ setTimeout(()=>{ alert('انتهت اللعبة'); grid=Array(16).fill(0); addTile(); addTile(); draw(); },50); }
+    });
+  })();
+
+  // Memory Cards
+  (function(){
+    const gridEl = document.getElementById('memoryGrid'); if(!gridEl) return;
+    const symbols = ['🍎','🍋','🍇','🍓','🍉','🥝','🍍','🍒'];
+    let cards = symbols.concat(symbols).sort(()=>Math.random()-0.5).map(s=>({s,open:false,matched:false}));
+    let openIdx = null, lock = false, matchedCount = 0;
+    function render(){
+      gridEl.innerHTML = '';
+      cards.forEach((card,idx)=>{
+        const div = document.createElement('div'); div.className='card';
+        div.textContent = card.open || card.matched ? card.s : '❓';
+        div.style.color = card.matched ? '#7dd3fc' : (card.open ? '#ff6fa9' : 'var(--accent)');
+        div.onclick = ()=>{
+          if(lock || card.open || card.matched) return;
+          card.open = true; drawStatus();
+          if(openIdx === null){ openIdx = idx; render(); }
+          else {
+            lock = true; render();
+            setTimeout(()=>{
+              if(cards[openIdx].s === card.s){
+                cards[openIdx].matched = card.matched = true; matchedCount += 2;
+              } else {
+                cards[openIdx].open = card.open = false;
+              }
+              openIdx = null; lock = false; render();
+              if(matchedCount === cards.length){ alert('فوز!'); reset(); }
+            }, 500);
+          }
+        };
+        gridEl.appendChild(div);
+      });
+    }
+    function reset(){
+      cards = symbols.concat(symbols).sort(()=>Math.random()-0.5).map(s=>({s,open:false,matched:false}));
+      openIdx=null; lock=false; matchedCount=0; render();
+    }
+    function drawStatus(){
+      const st = document.getElementById('status');
+      if(st) st.textContent = 'Memory Cards — مكشوف: ' + cards.filter(c=>c.open && !c.matched).length + ' | مطابق: ' + (matchedCount/2);
+    }
+    render();
+  })();
+
+  // إشارة تشغيل السكربت
+  document.getElementById('status').textContent = 'تم تحميل السكربت بنجاح — اختر لعبة وابدأ.';
+</script>
+</body>
+</html>
